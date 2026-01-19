@@ -3,66 +3,656 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configurateur Collection Mug</title>
+    <title>Configurateur de Mug de Luxe</title>
+
+    <!-- Three.js & OrbitControls -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
     <style>
-        body { margin: 0; background: #fff; font-family: sans-serif; }
-        #canvas-container { width: 100%; height: 300px; background: #f9f9f9; }
-        .controls { padding: 20px; max-width: 400px; margin: auto; }
-        .grid { display: grid; grid-template-cols: repeat(3, 1fr); gap: 10px; }
-        button { border: 1px solid #eee; padding: 10px; border-radius: 8px; background: white; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #FAFAFA;
+            color: #1a1a1a;
+            overflow-x: hidden;
+        }
+
+        /* Typography */
+        h1, h2, h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        /* Header & Stepper */
+        .header {
+            background: white;
+            border-bottom: 1px solid #E8E8E8;
+            padding: 3rem 0 2rem;
+        }
+
+        .brand-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 3rem;
+            letter-spacing: 2px;
+        }
+
+        .stepper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1.5px solid #D0D0D0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            background: white;
+            transition: all 0.3s ease;
+            margin-bottom: 0.8rem;
+            font-weight: 500;
+        }
+
+        .step.active .step-number {
+            background: #1a1a1a;
+            color: white;
+            border-color: #1a1a1a;
+        }
+
+        .step-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #999;
+            font-weight: 500;
+        }
+
+        .step.active .step-label {
+            color: #1a1a1a;
+        }
+
+        .step-line {
+            position: absolute;
+            top: 22px;
+            left: 50%;
+            width: 100%;
+            height: 1.5px;
+            background: #E8E8E8;
+            z-index: -1;
+        }
+
+        .step:last-child .step-line {
+            display: none;
+        }
+
+        /* Canvas Container */
+        .canvas-section {
+            background: white;
+            padding: 4rem 2rem;
+            min-height: 500px;
+        }
+
+        #canvas-container {
+            width: 100%;
+            max-width: 600px;
+            height: 500px;
+            margin: 0 auto;
+            cursor: grab;
+        }
+
+        #canvas-container:active {
+            cursor: grabbing;
+        }
+
+        /* View Controls */
+        .view-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .view-btn {
+            padding: 0.8rem 2rem;
+            border: 1.5px solid #1a1a1a;
+            background: white;
+            color: #1a1a1a;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .view-btn:hover {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .view-btn.active {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        /* Configuration Section */
+        .config-section {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .config-block {
+            margin-bottom: 4rem;
+        }
+
+        .config-title {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: 300;
+        }
+
+        .config-subtitle {
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 2rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Logo Grid */
+        .logo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .logo-item {
+            aspect-ratio: 1;
+            border: 1.5px solid #E8E8E8;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 1.5rem;
+        }
+
+        .logo-item:hover {
+            border-color: #1a1a1a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .logo-item.selected {
+            border-color: #1a1a1a;
+            border-width: 2px;
+            background: #FAFAFA;
+        }
+
+        .logo-item img {
+            max-width: 70%;
+            max-height: 70%;
+            object-fit: contain;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .logo-item:hover img {
+            opacity: 1;
+        }
+
+        /* Text Input */
+        .text-input-wrapper {
+            margin-top: 2rem;
+            max-width: 500px;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 1rem 0;
+            border: none;
+            border-bottom: 1.5px solid #E8E8E8;
+            background: transparent;
+            font-size: 16px;
+            font-family: 'Cormorant Garamond', serif;
+            transition: border-color 0.3s ease;
+            outline: none;
+        }
+
+        .text-input:focus {
+            border-bottom-color: #1a1a1a;
+        }
+
+        .text-input::placeholder {
+            color: #CCC;
+            font-style: italic;
+        }
+
+        .char-count {
+            text-align: right;
+            font-size: 11px;
+            color: #999;
+            margin-top: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            font-size: 11px;
+            color: #999;
+            letter-spacing: 1.5px;
+            border-top: 1px solid #E8E8E8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .brand-title {
+                font-size: 2rem;
+            }
+
+            .stepper {
+                padding: 0 1rem;
+            }
+
+            .step-label {
+                font-size: 9px;
+            }
+
+            .logo-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+            }
+
+            .canvas-section {
+                padding: 2rem 1rem;
+            }
+
+            #canvas-container {
+                height: 400px;
+            }
+        }
+
+        /* Loading */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #E8E8E8;
+            border-top-color: #1a1a1a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <div style="text-align:center; padding: 20px; font-size: 10px; letter-spacing: 2px; color: #999;">
-        01 LOGO — 02 TEXTE — 03 FINITION
+    <!-- Loading -->
+    <div class="loading" id="loading">
+        <div class="loader"></div>
     </div>
 
-    <div id="canvas-container"></div>
+    <!-- Header & Stepper -->
+    <div class="header">
+        <h1 class="brand-title">COLLECTION MUG</h1>
 
-    <div class="controls">
-        <div class="grid">
-            <button onclick="changeLogo('https://cdn-icons-png.flaticon.com/512/2583/2583157.png')">Logo 1</button>
-            <button onclick="changeLogo('https://cdn-icons-png.flaticon.com/512/2107/2107957.png')">Logo 2</button>
-            <button onclick="changeLogo('https://cdn-icons-png.flaticon.com/512/2583/2583151.png')">Logo 3</button>
+        <div class="stepper">
+            <div class="step active">
+                <div class="step-number">01</div>
+                <div class="step-label">Logo</div>
+                <div class="step-line"></div>
+            </div>
+            <div class="step">
+                <div class="step-number">02</div>
+                <div class="step-label">Gravure</div>
+                <div class="step-line"></div>
+            </div>
+            <div class="step">
+                <div class="step-number">03</div>
+                <div class="step-label">Finalisation</div>
+            </div>
         </div>
-        <input type="text" id="userText" placeholder="Texte de gravure..." oninput="updateText()" style="width:100%; margin-top:20px; border:none; border-bottom:1px solid #000; padding:10px;">
+    </div>
+
+    <!-- Canvas 3D -->
+    <div class="canvas-section">
+        <div id="canvas-container"></div>
+
+        <div class="view-controls">
+            <button class="view-btn active" onclick="viewFront()">Face Avant</button>
+            <button class="view-btn" onclick="viewBack()">Face Arrière</button>
+        </div>
+    </div>
+
+    <!-- Configuration -->
+    <div class="config-section">
+        <!-- Logo Selection -->
+        <div class="config-block">
+            <h2 class="config-title">Choisissez votre logo</h2>
+            <p class="config-subtitle">Sélectionnez un symbole pour personnaliser votre mug</p>
+
+            <div class="logo-grid">
+                <div class="logo-item" onclick="selectLogo(0, 'https://cdn-icons-png.flaticon.com/512/3209/3209035.png')">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3209/3209035.png" alt="Logo 1">
+                </div>
+                <div class="logo-item" onclick="selectLogo(1, 'https://cdn-icons-png.flaticon.com/512/2583/2583157.png')">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2583/2583157.png" alt="Logo 2">
+                </div>
+                <div class="logo-item" onclick="selectLogo(2, 'https://cdn-icons-png.flaticon.com/512/2107/2107957.png')">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2107/2107957.png" alt="Logo 3">
+                </div>
+                <div class="logo-item" onclick="selectLogo(3, 'https://cdn-icons-png.flaticon.com/512/2583/2583151.png')">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2583/2583151.png" alt="Logo 4">
+                </div>
+                <div class="logo-item" onclick="selectLogo(4, 'https://cdn-icons-png.flaticon.com/512/2107/2107845.png')">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2107/2107845.png" alt="Logo 5">
+                </div>
+                <div class="logo-item" onclick="selectLogo(5, 'https://cdn-icons-png.flaticon.com/512/3050/3050155.png')">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3050/3050155.png" alt="Logo 6">
+                </div>
+            </div>
+        </div>
+
+        <!-- Text Engraving -->
+        <div class="config-block">
+            <h2 class="config-title">Ajoutez votre gravure</h2>
+            <p class="config-subtitle">Personnalisez avec un texte unique</p>
+
+            <div class="text-input-wrapper">
+                <input
+                    type="text"
+                    class="text-input"
+                    id="userText"
+                    placeholder="Votre texte ici..."
+                    maxlength="30"
+                    oninput="updateText()"
+                >
+                <div class="char-count">
+                    <span id="charCount">0</span> / 30
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        COLLECTION EXCLUSIVE 2026 — FABRIQUÉ AVEC PASSION
     </div>
 
     <script>
-        // Initialisation 3D rapide
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 300, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, 300);
-        document.getElementById('canvas-container').appendChild(renderer.domElement);
+        // ===== THREE.JS SETUP =====
+        let scene, camera, renderer, controls;
+        let mug, logoTexture, textSprite;
+        let targetRotation = 0;
+        let currentRotation = 0;
+        let selectedLogoIndex = -1;
 
-        const geometry = new THREE.CylinderGeometry(1, 1, 2, 32);
-        const material = new THREE.MeshPhongMaterial({ color: 0xffffff });
-        const mug = new THREE.Mesh(geometry, material);
-        scene.add(mug);
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xffffff);
 
-        const light = new THREE.DirectionalLight(0xffffff, 1);
-        light.position.set(1, 1, 2).normalize();
-        scene.add(light);
-        scene.add(new THREE.AmbientLight(0x404040));
+            // Camera
+            const container = document.getElementById('canvas-container');
+            camera = new THREE.PerspectiveCamera(
+                45,
+                container.clientWidth / container.clientHeight,
+                0.1,
+                1000
+            );
+            camera.position.set(0, 1.5, 5);
 
-        camera.position.z = 4;
+            // Renderer
+            renderer = new THREE.WebGLRenderer({
+                antialias: true,
+                alpha: true
+            });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer.domElement);
+
+            // OrbitControls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.enableZoom = true;
+            controls.minDistance = 3;
+            controls.maxDistance = 8;
+            controls.maxPolarAngle = Math.PI / 2 + 0.3;
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(5, 10, 5);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+
+            const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
+            fillLight.position.set(-5, 0, -5);
+            scene.add(fillLight);
+
+            // Create Mug
+            createMug();
+
+            // Window resize
+            window.addEventListener('resize', onWindowResize, false);
+
+            // Start animation
+            animate();
+
+            // Hide loading
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('hidden');
+            }, 500);
+        }
+
+        function createMug() {
+            const mugGroup = new THREE.Group();
+
+            // Mug body (cylinder)
+            const bodyGeometry = new THREE.CylinderGeometry(0.8, 0.8, 2, 32);
+            const bodyMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0xf8f8f8,
+                roughness: 0.3,
+                metalness: 0.1,
+                clearcoat: 0.3,
+                clearcoatRoughness: 0.2,
+                reflectivity: 0.5
+            });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            body.castShadow = true;
+            mugGroup.add(body);
+
+            // Handle
+            const handleCurve = new THREE.CatmullRomCurve3([
+                new THREE.Vector3(0.8, 0.5, 0),
+                new THREE.Vector3(1.2, 0.5, 0),
+                new THREE.Vector3(1.2, -0.5, 0),
+                new THREE.Vector3(0.8, -0.5, 0)
+            ]);
+            const handleGeometry = new THREE.TubeGeometry(handleCurve, 20, 0.08, 8, false);
+            const handle = new THREE.Mesh(handleGeometry, bodyMaterial);
+            handle.castShadow = true;
+            mugGroup.add(handle);
+
+            // Inner rim (darker)
+            const rimGeometry = new THREE.CylinderGeometry(0.78, 0.78, 0.1, 32);
+            const rimMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0xe0e0e0,
+                roughness: 0.4,
+                metalness: 0.1
+            });
+            const rim = new THREE.Mesh(rimGeometry, rimMaterial);
+            rim.position.y = 1;
+            mugGroup.add(rim);
+
+            scene.add(mugGroup);
+            mug = mugGroup;
+        }
+
+        function selectLogo(index, url) {
+            // Update UI
+            document.querySelectorAll('.logo-item').forEach((item, i) => {
+                item.classList.toggle('selected', i === index);
+            });
+
+            // Update step
+            document.querySelectorAll('.step')[0].classList.remove('active');
+            document.querySelectorAll('.step')[1].classList.add('active');
+
+            selectedLogoIndex = index;
+
+            // Load and apply texture
+            const loader = new THREE.TextureLoader();
+            loader.load(url, (texture) => {
+                // Apply to cylinder body
+                const body = mug.children[0];
+                body.material.map = texture;
+                body.material.needsUpdate = true;
+                logoTexture = texture;
+            });
+        }
+
+        function updateText() {
+            const text = document.getElementById('userText').value;
+            const charCount = document.getElementById('charCount');
+            charCount.textContent = text.length;
+
+            // Update step
+            if (text.length > 0) {
+                document.querySelectorAll('.step')[1].classList.remove('active');
+                document.querySelectorAll('.step')[2].classList.add('active');
+            }
+
+            // Remove old sprite
+            if (textSprite) {
+                mug.remove(textSprite);
+            }
+
+            if (text.trim() === '') return;
+
+            // Create canvas for text
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = 1024;
+            canvas.height = 256;
+
+            // Draw text
+            context.fillStyle = '#333333';
+            context.font = 'italic 60px "Cormorant Garamond", serif';
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            context.fillText(text, 512, 128);
+
+            // Create sprite
+            const texture = new THREE.CanvasTexture(canvas);
+            const spriteMaterial = new THREE.SpriteMaterial({
+                map: texture,
+                transparent: true,
+                opacity: 0.9
+            });
+            textSprite = new THREE.Sprite(spriteMaterial);
+            textSprite.position.set(0, -0.5, 0.81);
+            textSprite.scale.set(2, 0.5, 1);
+
+            mug.add(textSprite);
+        }
+
+        function viewFront() {
+            targetRotation = 0;
+            updateViewButtons(0);
+        }
+
+        function viewBack() {
+            targetRotation = Math.PI;
+            updateViewButtons(1);
+        }
+
+        function updateViewButtons(activeIndex) {
+            document.querySelectorAll('.view-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i === activeIndex);
+            });
+        }
 
         function animate() {
             requestAnimationFrame(animate);
-            mug.rotation.y += 0.01;
+
+            // Smooth rotation transition
+            if (Math.abs(targetRotation - currentRotation) > 0.01) {
+                currentRotation += (targetRotation - currentRotation) * 0.1;
+                mug.rotation.y = currentRotation;
+            }
+
+            controls.update();
             renderer.render(scene, camera);
         }
-        animate();
 
-        function changeLogo(url) {
-            new THREE.TextureLoader().load(url, t => {
-                mug.material.map = t;
-                mug.material.needsUpdate = true;
-            });
+        function onWindowResize() {
+            const container = document.getElementById('canvas-container');
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
         }
+
+        // Initialize on load
+        window.addEventListener('load', init);
     </script>
 </body>
 </html>
