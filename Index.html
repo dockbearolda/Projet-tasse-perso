@@ -2,145 +2,67 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Collection Personnalisée - Mug 3D</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurateur Collection Mug</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;1,400&family=Inter:wght@300;400&display=swap');
-        
-        body { font-family: 'Inter', sans-serif; background-color: #ffffff; overflow-x: hidden; }
-        h1, .serif { font-family: 'Bodoni Moda', serif; }
-        
-        #canvas-container {
-            width: 100%;
-            height: 45vh;
-            touch-action: none;
-            background: radial-gradient(circle, #ffffff 0%, #f0f0f0 100%);
-        }
-
-        .stepper-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #e5e7eb;
-            transition: all 0.4s ease;
-        }
-        .stepper-dot.active {
-            background: #000;
-            transform: scale(1.5);
-        }
-        
-        .logo-btn {
-            aspect-ratio: 1;
-            transition: all 0.3s ease;
-            border: 1px solid #f3f4f6;
-        }
-        .logo-btn:active { transform: scale(0.95); border-color: #000; }
+        body { margin: 0; background: #fff; font-family: sans-serif; }
+        #canvas-container { width: 100%; height: 300px; background: #f9f9f9; }
+        .controls { padding: 20px; max-width: 400px; margin: auto; }
+        .grid { display: grid; grid-template-cols: repeat(3, 1fr); gap: 10px; }
+        button { border: 1px solid #eee; padding: 10px; border-radius: 8px; background: white; }
     </style>
 </head>
-<body class="text-gray-900">
-
-    <div class="pt-8 px-6 max-w-md mx-auto">
-        <div class="flex justify-between items-center mb-2">
-            <span class="text-[10px] uppercase tracking-[0.2em] font-semibold">01 Emblème</span>
-            <span class="text-[10px] uppercase tracking-[0.2em] text-gray-400">02 Gravure</span>
-            <span class="text-[10px] uppercase tracking-[0.2em] text-gray-400">03 Finaliser</span>
-        </div>
-        <div class="flex gap-4">
-            <div class="h-[2px] flex-1 bg-black"></div>
-            <div class="h-[2px] flex-1 bg-gray-100"></div>
-            <div class="h-[2px] flex-1 bg-gray-100"></div>
-        </div>
+<body>
+    <div style="text-align:center; padding: 20px; font-size: 10px; letter-spacing: 2px; color: #999;">
+        01 LOGO — 02 TEXTE — 03 FINITION
     </div>
 
     <div id="canvas-container"></div>
 
-    <main class="px-6 py-4 max-w-md mx-auto space-y-8">
-        
-        <section>
-            <h2 class="serif text-2xl mb-4 italic">Votre Collection</h2>
-            <div class="grid grid-cols-3 gap-3">
-                <button onclick="applyLogo('https://cdn-icons-png.flaticon.com/512/2583/2583157.png')" class="logo-btn bg-gray-50 flex items-center justify-center p-4 rounded-xl">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2583/2583157.png" class="w-full opacity-60">
-                </button>
-                <button onclick="applyLogo('https://cdn-icons-png.flaticon.com/512/2107/2107957.png')" class="logo-btn bg-gray-50 flex items-center justify-center p-4 rounded-xl">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2107/2107957.png" class="w-full opacity-60">
-                </button>
-                <button onclick="applyLogo('https://cdn-icons-png.flaticon.com/512/2583/2583118.png')" class="logo-btn bg-gray-50 flex items-center justify-center p-4 rounded-xl">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2583/2583118.png" class="w-full opacity-60">
-                </button>
-                <button onclick="applyLogo('https://cdn-icons-png.flaticon.com/512/1042/1042261.png')" class="logo-btn bg-gray-50 flex items-center justify-center p-4 rounded-xl">
-                    <img src="https://cdn-icons-png.flaticon.com/512/1042/1042261.png" class="w-full opacity-60">
-                </button>
-                <button onclick="applyLogo('https://cdn-icons-png.flaticon.com/512/2583/2583151.png')" class="logo-btn bg-gray-50 flex items-center justify-center p-4 rounded-xl">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2583/2583151.png" class="w-full opacity-60">
-                </button>
-                <button onclick="applyLogo('https://cdn-icons-png.flaticon.com/512/825/825590.png')" class="logo-btn bg-gray-50 flex items-center justify-center p-4 rounded-xl">
-                    <img src="https://cdn-icons-png.flaticon.com/512/825/825590.png" class="w-full opacity-60">
-                </button>
-            </div>
-        </section>
-
-        <section class="pb-12">
-            <h2 class="serif text-xl mb-3 italic">Message Personnel</h2>
-            <input type="text" id="textInput" maxlength="20" placeholder="Saisir votre texte ici..." 
-                class="w-full border-b border-gray-200 py-3 outline-none focus:border-black transition-all text-lg font-light tracking-wide">
-            <p class="text-[10px] text-gray-400 mt-2 uppercase tracking-widest text-right italic">Édition Limitée 2026</p>
-        </section>
-        
-    </main>
+    <div class="controls">
+        <div class="grid">
+            <button onclick="changeLogo('https://cdn-icons-png.flaticon.com/512/2583/2583157.png')">Logo 1</button>
+            <button onclick="changeLogo('https://cdn-icons-png.flaticon.com/512/2107/2107957.png')">Logo 2</button>
+            <button onclick="changeLogo('https://cdn-icons-png.flaticon.com/512/2583/2583151.png')">Logo 3</button>
+        </div>
+        <input type="text" id="userText" placeholder="Texte de gravure..." oninput="updateText()" style="width:100%; margin-top:20px; border:none; border-bottom:1px solid #000; padding:10px;">
+    </div>
 
     <script>
-        let scene, camera, renderer, mug, textureLoader;
-        
-        init();
-        animate();
+        // Initialisation 3D rapide
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 300, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, 300);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-        function init() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(45, window.innerWidth / (window.innerHeight * 0.45), 0.1, 1000);
-            camera.position.z = 5;
+        const geometry = new THREE.CylinderGeometry(1, 1, 2, 32);
+        const material = new THREE.MeshPhongMaterial({ color: 0xffffff });
+        const mug = new THREE.Mesh(geometry, material);
+        scene.add(mug);
 
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight * 0.45);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            document.getElementById('canvas-container').appendChild(renderer.domElement);
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(1, 1, 2).normalize();
+        scene.add(light);
+        scene.add(new THREE.AmbientLight(0x404040));
 
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-            scene.add(ambientLight);
-            const pointLight = new THREE.PointLight(0xffffff, 0.5);
-            pointLight.position.set(5, 5, 5);
-            scene.add(pointLight);
-
-            // Création simplifiée du Mug
-            const geometry = new THREE.CylinderGeometry(1, 1, 2.5, 32);
-            const material = new THREE.MeshPhongMaterial({ color: 0xffffff, shininess: 100 });
-            mug = new THREE.Mesh(geometry, material);
-            scene.add(mug);
-
-            textureLoader = new THREE.TextureLoader();
-        }
-
-        function applyLogo(url) {
-            textureLoader.load(url, function(texture) {
-                mug.material.map = texture;
-                mug.material.needsUpdate = true;
-            });
-        }
+        camera.position.z = 4;
 
         function animate() {
             requestAnimationFrame(animate);
-            mug.rotation.y += 0.005; // Rotation lente automatique
+            mug.rotation.y += 0.01;
             renderer.render(scene, camera);
         }
+        animate();
 
-        // Ajustement taille écran iPhone
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / (window.innerHeight * 0.45);
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight * 0.45);
-        });
+        function changeLogo(url) {
+            new THREE.TextureLoader().load(url, t => {
+                mug.material.map = t;
+                mug.material.needsUpdate = true;
+            });
+        }
     </script>
 </body>
 </html>
